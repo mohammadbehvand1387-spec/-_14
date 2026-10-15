@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050912">
+<title>ODYSSEY | کابین فرماندهی</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --cyan: #54eaff;
+  --blue: #168dff;
+  --green: #6bffbc;
+  --red: #ff5269;
+  --orange: #ffb45d;
+  --bg: #050912;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: #e0f5ff;
+  font-family: Tahoma, Arial, sans-serif;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
+#game {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 38%, #10283e 0%, #08111f 48%, #02040a 100%);
+}
+
+/* =========================
+   ستاره های پشت شیشه
+========================= */
+
+#space {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 56%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #d9faff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #b5f7ff;
+  animation: starGlow 2s infinite alternate;
+}
+
+@keyframes starGlow {
+  from { opacity: .25; }
+  to { opacity: 1; }
+}
+
+/* =========================
+   نمایشگر بالای کابین
+========================= */
+
+.topbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 15px;
+  background: linear-gradient(90deg, #060c17ee, #10273aee, #060c17ee);
+  border-bottom: 1px solid #2c6c88;
+  box-shadow: 0 5px 20px #0008;
+}
+
+.brand {
+  color: var(--cyan);
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.mission {
+  font-size: 10px;
+  color: #9ebbc9;
+  margin-top: 5px;
+}
+
+.system-state {
+  text-align: left;
+  font-size: 10px;
+  color: var(--green);
+}
+
+.online-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--green);
+  margin-left: 5px;
+}
+
+/* =========================
+   شیشه جلوی سفینه
+========================= */
+
+.windshield {
+  position: relative;
+  z-index: 1;
+  width: 92%;
+  max-width: 1100px;
+  height: clamp(230px, 42vh, 410px);
+  margin: 12px auto 0;
+  overflow: hidden;
+  border: 5px solid #263a4c;
+  border-radius: 48% 48% 9% 9% / 16% 16% 7% 7%;
+  background:
+    radial-gradient(ellipse at 50% 100%, #1c3e59 0%, transparent 60%),
+    linear-gradient(180deg, #071222 0%, #0b1e35 65%, #101b2b 100%);
+  box-shadow:
+    inset 0 0 35px #000,
+    inset 0 0 90px #1677b233,
+    0 0 25px #000,
+    0 0 12px #2584a955;
+}
+
+.windshield::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(125deg, #ffffff0b, transparent 30%),
+    linear-gradient(180deg, transparent 60%, #02060bd9);
+}
+
+.windshield::after {
+  content: "ODYSSEY  //  FLIGHT DECK";
+  position: absolute;
+  top: 15px;
+  left: 18px;
+  color: #7ad8f8;
+  font: 10px monospace;
+  direction: ltr;
+  opacity: .8;
+  z-index: 3;
+}
+
+.space-label {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  color: #85d9ff;
+  font-size: 11px;
+  letter-spacing: 3px;
+  white-space: nowrap;
+  opacity: .7;
+}
+
+.horizon {
+  position: absolute;
+  width: 120%;
+  height: 70px;
+  left: -10%;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent, #4c8ca522, #111e30);
+  border-top: 1px solid #57c9ff55;
+}
+
+/* خطوط راهنمای دید خلبان */
+
+.aim {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #74dfff8a;
+  border-radius: 50%;
+  z-index: 2;
+  opacity: .6;
+}
+
+.aim::before,
+.aim::after {
+  content: "";
+  position: absolute;
+  background: #74dfffaa;
+}
+
+.aim::before {
+  width: 70px;
+  height: 1px;
+  top: 50%;
+  left: -12px;
+}
+
+.aim::after {
+  width: 1px;
+  height: 70px;
+  left: 50%;
+  top: -12px;
+}
+
+/* افکت خطوط اسکن */
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .12;
+  z-index: 3;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 4px,
+    #6eeaff 5px
+  );
+}
+
+/* =========================
+   بدنه داخلی کابین
+========================= */
+
+.cockpit {
+  position: relative;
+  z-index: 2;
+  margin-top: -3px;
+  padding: 0 12px 20px;
+  background:
+    linear-gradient(180deg, #111e2c 0%, #090f19 18%, #05080e 100%);
+  border-top: 2px solid #34495b;
+  box-shadow: 0 -15px 30px #0008;
+}
+
+.cockpit-inner {
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* =========================
+   نمایشگرهای وضعیت
+========================= */
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.status-card {
+  padding: 11px 9px;
+  background: linear-gradient(145deg, #122638, #07101a);
+  border: 1px solid #27485d;
+  border-radius: 7px;
+  min-width: 0;
+  box-shadow: inset 0 0 12px #0006;
+}
+
+.status-title {
+  color: #a3c6d9;
+  font-size: 10px;
+}
+
+.status-value {
+  font-size: 19px;
+  margin-top: 7px;
+  color: var(--cyan);
+  direction: ltr;
+  text-align: right;
+  font-weight: bold;
+}
+
+.status-unit {
+  font-size: 9px;
+  color: #6c98ad;
+}
+
+.progress {
+  height: 4px;
+  margin-top: 8px;
+  background: #172c3b;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  transition: width .3s;
+}
+
+.fuel-bar span { background: var(--orange); }
+.energy-bar span { background: var(--cyan); }
+.hull-bar span { background: var(--green); }
+
+/* =========================
+   پنل کنترل
+========================= */
+
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--cyan);
+  margin: 17px 0 10px;
+}
+
+.panel-title small {
+  font-size: 9px;
+  color: #648ca0;
+}
+
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.control {
+  min-height: 72px;
+  padding: 9px 5px;
+  background: linear-gradient(145deg, #162738, #09111c);
+  border: 1px solid #29495d;
+  border-radius: 7px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  transition: .15s;
+  font-size: 10px;
+}
+
+.control:active {
+  transform: scale(.95);
+}
+
+.control .symbol {
+  font-size: 22px;
+  color: #8adfff;
+}
+
+.control.active {
+  border-color: var(--green);
+  background: #103128;
+  box-shadow: inset 0 0 14px #00ff9d13, 0 0 9px #00ff9d13;
+}
+
+.control.active .symbol {
+  color: var(--green);
+}
+
+.control.danger {
+  border-color: #7b3041;
+}
+
+.control.danger .symbol {
+  color: var(--red);
+}
+
+/* =========================
+   فرمان و شخصیت خلبان
+========================= */
+
+.pilot-area {
+  position: relative;
+  height: 260px;
+  margin-top: 8px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 100%, #273848 0%, #111b28 45%, transparent 75%);
+  border-bottom: 1px solid #263f52;
+}
+
+/* شانه ها و لباس خلبان */
+
+.pilot-body {
+  position: absolute;
+  width: 240px;
+  height: 180px;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #0b1622, #526273 45%, #263a4c 70%, #09131e);
+  border: 2px solid #607889;
+  border-radius: 48% 48% 10% 10%;
+  box-shadow: inset 0 0 25px #000, 0 -5px 25px #4bdfff12;
+}
+
+/* گردن خلبان */
+
+.pilot-neck {
+  position: absolute;
+  width: 58px;
+  height: 45px;
+  left: 50%;
+  bottom: 99px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #465260, #b0a28c, #4d5967);
+  border-radius: 12px;
+  z-index: 2;
+}
+
+/* سر و کلاه */
+
+.pilot-head {
+  position: absolute;
+  left: 50%;
+  bottom: 124px;
+  transform: translateX(-50%);
+  width: 94px;
+  height: 106px;
+  border-radius: 44% 44% 42% 42%;
+  background: linear-gradient(90deg, #182431, #758797 35%, #a7b7c3 52%, #425568);
+  border: 3px solid #849eaf;
+  z-index: 3;
+  box-shadow: 0 0 20px #000;
+}
+
+.pilot-head::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 5px;
+  right: 5px;
+  height: 39px;
+  border-radius: 10px 10px 19px 19px;
+  background: linear-gradient(180deg, #06121e, #12334a 60%, #1b5871);
+  border: 2px solid #9bdfff;
+  box-shadow: inset 0 0 14px #39cfff66;
+}
+
+.pilot-head::after {
+  content: "";
+  position: absolute;
+  top: 43px;
+  left: 14px;
+  right: 14px;
+  height: 3px;
+  background: #7ceaff;
+  box-shadow: 0 0 9px #45eaff;
+}
+
+/* بازوهای خلبان */
+
+.arm {
+  position: absolute;
+  width: 100px;
+  height: 29px;
+  bottom: 65px;
+  background: linear-gradient(180deg, #8e9caa, #34485a 65%, #152433);
+  border: 2px solid #70899c;
+  border-radius: 20px;
+  z-index: 5;
+}
+
+.arm-left {
+  left: calc(50% - 110px);
+  transform: rotate(24deg);
+  transform-origin: right center;
+}
+
+.arm-right {
+  right: calc(50% - 110px);
+  transform: rotate(-24deg);
+  transform-origin: left center;
+}
+
+/* دستکش ها */
+
+.hand {
+  position: absolute;
+  width: 35px;
+  height: 29px;
+  bottom: 46px;
+  background: linear-gradient(135deg, #d2e0e8, #657d8d 65%, #263d50);
+  border: 2px solid #a5d2e7;
+  border-radius: 12px 12px 16px 16px;
+  z-index: 7;
+}
+
+.hand-left {
+  left: calc(50% - 104px);
+  transform: rotate(18deg);
+}
+
+.hand-right {
+  right: calc(50% - 104px);
+  transform: rotate(-18deg);
+}
+
+/* فرمان */
+
+.steering-zone {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 220px;
+  height: 220px;
+  transform: translateX(-50%);
+  z-index: 6;
+}
+
+.steering-wheel {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  left: 50%;
+  bottom: -30px;
+  transform: translateX(-50%) rotate(0deg);
+  border: 15px solid #253746;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px #698092,
+    inset 0 0 0 4px #111d29,
+    0 0 18px #000;
+  transition: transform .08s linear;
+  touch-action: none;
+  cursor: grab;
+}
+
+.steering-wheel:active {
+  cursor: grabbing;
+}
+
+.wheel-spoke {
+  position: absolute;
+  width: 10px;
+  height: 65px;
+  background: linear-gradient(90deg, #526c7e, #172737);
+  border: 1px solid #829aaa;
+  left: 50%;
+  top: 50%;
+  transform-origin: center top;
+}
+
+.spoke-one {
+  transform: translateX(-50%) rotate(0deg);
+}
+
+.spoke-two {
+  transform: translateX(-50%) rotate(120deg);
+}
+
+.spoke-three {
+  transform: translateX(-50%) rotate(240deg);
+}
+
+.wheel-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 47px;
+  height: 47px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #1d566f, #081521);
+  border: 3px solid #9ceaff;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #00cfff77;
+  display: grid;
+  place-items: center;
+  color: var(--cyan);
+  font-size: 17px;
+}
+
+.wheel-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #9bc5d7;
+  white-space: nowrap;
+  z-index: 8;
+}
+
+/* =========================
+   دسته های حرکت
+========================= */
+
+.flight-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.flight-button {
+  padding: 14px 5px;
+  border: 1px solid #27637b;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #18344a, #081522);
+  color: #c8f3ff;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.flight-button:active {
+  background: #1a6178;
+  transform: scale(.97);
+}
+
+.flight-button.boost {
+  border-color: #9d6b37;
+  color: var(--orange);
+}
+
+.flight-button.stop {
+  border-color: #7b3041;
+  color: #ff8393;
+}
+
+/* =========================
+   نوار پایین
+========================= */
+
+.bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin-top: 15px;
+}
+
+.nav-button {
+  background: #080f19;
+  border: 1px solid #253e50;
+  padding: 11px 3px;
+  border-radius: 7px;
+  color: #8db5c8;
+  font-size: 10px;
+}
+
+.nav-button span {
+  display: block;
+  font-size: 19px;
+  margin-bottom: 5px;
+}
+
+.nav-button:active {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+/* =========================
+   دفترچه راهنما
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #000c;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 470px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: linear-gradient(145deg, #142738, #050c15);
+  border: 1px solid #39d7ff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 40px #00bfff22;
+}
+
+.modal-box h2 {
+  color: var(--cyan);
+  font-size: 18px;
+  margin-top: 0;
+}
+
+.manual-section {
+  padding: 12px 0;
+  border-bottom: 1px solid #244153;
+  line-height: 2;
+  font-size: 12px;
+  color: #c0d8e5;
+}
+
+.manual-section strong {
+  color: var(--green);
+}
+
+.close-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background: #0c3547;
+  border: 1px solid #2ca6c8;
+  border-radius: 7px;
+  color: white;
+}
+
+/* پیام های روی صفحه */
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  opacity: 0;
+  z-index: 80;
+  pointer-events: none;
+  background: #071b2a;
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 12px;
+  width: max-content;
+  max-width: 90%;
+  text-align: center;
+  transition: .25s;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (min-width: 800px) {
+  .cockpit {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .pilot-area {
+    height: 310px;
+  }
+
+  .steering-zone {
+    transform: translateX(-50%) scale(1.15);
+    transform-origin: bottom center;
+  }
+
+  .control-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .status-card {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 390px) {
+  .status-grid {
+    gap: 5px;
+  }
+
+  .status-card {
+    padding: 9px 5px;
+  }
+
+  .status-value {
+    font-size: 16px;
+  }
+
+  .pilot-area {
+    height: 230px;
+  }
+
+  .steering-zone {
+    transform: translateX(-50%) scale(.87);
+    transform-origin: bottom center;
+  }
+
+  .control {
+    min-height: 65px;
+    font-size: 9px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+  <div id="space"></div>
+
+  <header class="topbar">
+    <div>
+      <div class="brand">◈ ODYSSEY</div>
+      <div class="mission">ماموریت نجات بشریت · مرحله ۰۱</div>
+    </div>
+
+    <div class="system-state">
+      <span class="online-dot"></span>
+      سیستم فعال
+      <div style="margin-top:5px;color:#769db1">
+        زمین · مدار خروجی
+      </div>
+    </div>
+  </header>
+
+  <!-- شیشه جلوی سفینه -->
+
+  <section class="windshield" id="windshield">
+    <div class="space-label">UNKNOWN SPACE</div>
+    <div class="aim"></div>
+    <div class="horizon"></div>
+    <div class="scanlines"></div>
+  </section>
+
+  <!-- کابین و تجهیزات -->
+
+  <section class="cockpit">
+    <div class="cockpit-inner">
+
+      <div class="panel-title">
+        <span>◈ وضعیت حیاتی سفینه</span>
+        <small>FLIGHT SYSTEMS</small>
+      </div>
+
+      <div class="status-grid">
+
+        <div class="status-card">
+          <div class="status-title">سوخت موتور</div>
+          <div class="status-value">
+            <span id="fuelValue">100</span><span class="status-unit">%</span>
+          </div>
+          <div class="progress fuel-bar">
+            <span id="fuelBar" style="width:100%"></span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <div class="status-title">اکسیژن</div>
+          <div class="status-value">
+            <span id="oxygenValue">98</span><span class="status-unit">%</span>
+          </div>
+          <div class="progress">
+            <span id="oxygenBar" style="width:98%"></span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <div class="status-title">سلامت بدنه</div>
+          <div class="status-value">
+            <span id="hullValue">100</span><span class="status-unit">%</span>
+          </div>
+          <div class="progress hull-bar">
+            <span id="hullBar" style="width:100%"></span>
+          </div>
+        </div>
+
+        <div class="status-card">
+          <div class="status-title">انرژی</div>
+          <div class="status-value">
+            <span id="energyValue">87</span><span class="status-unit">%</span>
+          </div>
+          <div class="progress energy-bar">
+            <span id="energyBar" style="width:87%"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- شخصیت خلبان و فرمان -->
+
+      <div class="panel-title">
+        <span>◈ جایگاه خلبان</span>
+        <small>MANUAL FLIGHT CONTROL</small>
+      </div>
+
+      <div class="pilot-area">
+
+        <div class="pilot-body"></div>
+        <div class="pilot-neck"></div>
+        <div class="pilot-head"></div>
+
+        <div class="arm arm-left"></div>
+        <div class="arm arm-right"></div>
+
+        <div class="hand hand-left"></div>
+        <div class="hand hand-right"></div>
+
+        <div class="steering-zone">
+
+          <div class="steering-wheel" id="wheel">
+
+            <div class="wheel-spoke spoke-one"></div>
+            <div class="wheel-spoke spoke-two"></div>
+            <div class="wheel-spoke spoke-three"></div>
+
+            <div class="wheel-center">✦</div>
+
+          </div>
+
+          <div class="wheel-hint">
+            فرمان را لمس کن و بچرخان
+          </div>
+
+        </div>
+      </div>
+
+      <!-- کنترل های پرواز -->
+
+      <div class="panel-title">
+        <span>◈ کنترل پرواز</span>
+        <small>FLIGHT DECK</small>
+      </div>
+
+      <div class="flight-controls">
+
+        <button class="flight-button" id="leftBtn">
+          ◀ گردش چپ
+        </button>
+
+        <button class="flight-button" id="centerBtn">
+          ◎ تثبیت مسیر
+        </button>
+
+        <button class="flight-button" id="rightBtn">
+          گردش راست ▶
+        </button>
+
+        <button class="flight-button boost" id="engineBtn">
+          ▲ موتور
+        </button>
+
+        <button class="flight-button" id="brakeBtn">
+          ▣ ترمز
+        </button>
+
+        <button class="flight-button stop" id="emergencyBtn">
+          ⚠ اضطراری
+        </button>
+
+      </div>
+
+      <!-- دکمه های پنل -->
+
+      <div class="panel-title">
+        <span>◈ تجهیزات جانبی</span>
+        <small>SHIP SYSTEMS</small>
+      </div>
+
+      <div class="control-grid">
+
+        <button class="control" id="lightBtn">
+          <span class="symbol">☼</span>
+          <span>روشنایی</span>
+        </button>
+
+        <button class="control" id="radarBtn">
+          <span class="symbol">◎</span>
+          <span>رادار</span>
+        </button>
+
+        <button class="control" id="shieldBtn">
+          <span class="symbol">⬡</span>
+          <span>سپر دفاعی</span>
+        </button>
+
+        <button class="control" id="commBtn">
+          <span class="symbol">⌁</span>
+          <span>ارتباطات</span>
+        </button>
+
+        <button class="control" id="scanBtn">
+          <span class="symbol">⌕</span>
+          <span>اسکنر</span>
+        </button>
+
+        <button class="control" id="mapBtn">
+          <span class="symbol">▦</span>
+          <span>نقشه</span>
+        </button>
+
+        <button class="control" id="autoBtn">
+          <span class="symbol">◉</span>
+          <span>خلبان خودکار</span>
+        </button>
+
+        <button class="control" id="powerBtn">
+          <span class="symbol">ϟ</span>
+          <span>مدیریت انرژی</span>
+        </button>
+
+      </div>
+
+      <!-- نوار پایین -->
+
+      <div class="bottom-nav">
+
+        <button class="nav-button" id="manualBtn">
+          <span>📖</span>
+          دفترچه راهنما
+        </button>
+
+        <button class="nav-button" id="missionBtn">
+          <span>🎯</span>
+          ماموریت
+        </button>
+
+        <button class="nav-button" id="logBtn">
+          <span>▤</span>
+          گزارش سیستم
+        </button>
+
+        <button class="nav-button" id="settingsBtn">
+          <span>⚙</span>
+          تنظیمات
+        </button>
+
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- دفترچه راهنما -->
+
+<div class="modal" id="manualModal">
+  <div class="modal-box">
+
+    <h2>📖 دفترچه راهنمای سفینه ODYSSEY</h2>
+
+    <div class="manual-section">
+      <strong>۱. ماموریت شما</strong><br>
+      سفینه از زمین خارج شده است. هدف نهایی، انتقال آخرین بازماندگان
+      بشر از منطقه خطرناک خورشیدی به مقصدی امن در فضای ناشناخته است.
+    </div>
+
+    <div class="manual-section">
+      <strong>۲. فرمان سفینه</strong><br>
+      فرمان را با انگشت بکش و بچرخان. همچنین می‌توانی از دکمه‌های
+      گردش چپ و راست استفاده کنی. در این نسخه، فرمان و نمایشگرها
+      تعاملی هستند؛ حرکت واقعی در فضا در مرحله بعد اضافه می‌شود.
+    </div>
+
+    <div class="manual-section">
+      <strong>۳. سوخت موتور</strong><br>
+      روشن نگه داشتن موتور سوخت مصرف می‌کند. سوخت تمام شود،
+      دیگر نمی‌توانی از موتور برای تغییر مسیر استفاده کنی.
+    </div>
+
+    <div class="manual-section">
+      <strong>۴. سپر دفاعی</strong><br>
+      سپر برای محافظت در برابر اجرام خطرناک در نظر گرفته شده است.
+      فعلاً فقط کنترل آن در کابین پیاده‌سازی شده و برخوردها در
+      مرحله گیم‌پلی اضافه می‌شوند.
+    </div>
+
+    <div class="manual-section">
+      <strong>۵. رادار و اسکنر</strong><br>
+      رادار و اسکنر برای شناسایی اجرام فضایی و خطرهای احتمالی هستند.
+      فعلاً حالت نمایشی دارند.
+    </div>
+
+    <div class="manual-section">
+      <strong>۶. اکسیژن و سلامت بدنه</strong><br>
+      این دو شاخص وضعیت سفینه را نمایش می‌دهند. در نسخه فعلی
+      مقدارشان ثابت است؛ سیستم آسیب، تعمیر و مصرف اکسیژن بعداً
+      به گیم‌پلی متصل می‌شود.
+    </div>
+
+    <div class="manual-section">
+      <strong>۷. خلبان خودکار</strong><br>
+      با فعال کردن این گزینه، فرمان موقتاً به حالت خودکار می‌رود.
+      برای کنترل دستی دوباره آن را غیرفعال کن.
+    </div>
+
+    <div class="manual-section">
+      <strong>۸. هشدار مهم</strong><br>
+      در نسخه بعدی، جاذبه سیاره‌ها، برخورد با سیارک‌ها،
+      شهاب‌سنگ‌ها و مدیریت واقعی منابع به بازی اضافه می‌شوند.
+    </div>
+
+    <button class="close-button" id="closeManual">
+      بازگشت به کابین
+    </button>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* =========================
+   ساخت ستاره های فضا
+========================= */
+
+const space = document.getElementById("space");
+
+for (let i = 0; i < 150; i++) {
+
+  const star = document.createElement("div");
+
+  star.className = "star";
+
+  star.style.left = Math.random() * 100 + "%";
+  star.style.top = Math.random() * 100 + "%";
+
+  const size = Math.random() * 2 + 1;
+
+  star.style.width = size + "px";
+  star.style.height = size + "px";
+
+  star.style.animationDelay = Math.random() * 3 + "s";
+
+  space.appendChild(star);
+}
+
+/* =========================
+   پیام های کابین
+========================= */
+
+const toastBox = document.getElementById("toast");
+
+let toastTimer;
+
+function notify(message) {
+
+  toastBox.textContent = message;
+  toastBox.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(() => {
+    toastBox.classList.remove("show");
+  }, 2300);
+}
+
+/* =========================
+   چرخاندن فرمان
+========================= */
+
+const wheel = document.getElementById("wheel");
+
+let wheelAngle = 0;
+let dragging = false;
+let lastPointerAngle = 0;
+let manualControl = true;
+
+function setWheelAngle(angle) {
+
+  wheelAngle = Math.max(-120, Math.min(120, angle));
+
+  wheel.style.transform =
+    `translateX(-50%) rotate(${wheelAngle}deg)`;
+
+  // حرکت جزئی بازوها متناسب با فرمان
+  const armLeft = document.querySelector(".arm-left");
+  const armRight = document.querySelector(".arm-right");
+
+  armLeft.style.transform =
+    `rotate(${24 + wheelAngle * 0.15}deg)`;
+
+  armRight.style.transform =
+    `rotate(${-24 + wheelAngle * 0.15}deg)`;
+}
+
+function getPointerAngle(event) {
+
+  const rect = wheel.getBoundingClientRect();
+
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  return Math.atan2(
+    event.clientY - centerY,
+    event.clientX - centerX
+  ) * 180 / Math.PI;
+}
+
+wheel.addEventListener("pointerdown", event => {
+
+  if (!manualControl) {
+    notify("خلبان خودکار فعال است.");
+    return;
+  }
+
+  dragging = true;
+
+  lastPointerAngle = getPointerAngle(event);
+
+  wheel.setPointerCapture(event.pointerId);
+});
+
+wheel.addEventListener("pointermove", event => {
+
+  if (!dragging) return;
+
+  const current = getPointerAngle(event);
+
+  let delta = current - lastPointerAngle;
+
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
+
+  setWheelAngle(wheelAngle + delta);
+
+  lastPointerAngle = current;
+});
+
+function stopDragging() {
+  dragging = false;
+}
+
+wheel.addEventListener("pointerup", stopDragging);
+wheel.addEventListener("pointercancel", stopDragging);
+
+/* =========================
+   کنترل جهت
+========================= */
+
+function turn(direction) {
+
+  if (!manualControl) {
+    notify("ابتدا خلبان خودکار را خاموش کن.");
+    return;
+  }
+
+  setWheelAngle(wheelAngle + direction * 15);
+
+  notify(
+    direction < 0
+      ? "فرمان به سمت چپ چرخید."
+      : "فرمان به سمت راست چرخید."
+  );
+}
+
+document.getElementById("leftBtn").onclick =
+  () => turn(-1);
+
+document.getElementById("rightBtn").onclick =
+  () => turn(1);
+
+document.getElementById("centerBtn").onclick = () => {
+  setWheelAngle(0);
+  notify("فرمان در مرکز قرار گرفت.");
+};
+
+/* =========================
+   موتور و سوخت
+========================= */
+
+let fuel = 100;
+let engineOn = false;
+let shieldOn = false;
+let autoPilot = false;
+let lightsOn = true;
+
+const fuelValue = document.getElementById("fuelValue");
+const fuelBar = document.getElementById("fuelBar");
+
+function updateFuel() {
+
+  fuel = Math.max(0, Math.min(100, fuel));
+
+  fuelValue.textContent = Math.round(fuel);
+  fuelBar.style.width = fuel + "%";
+
+  if (fuel <= 0) {
+
+    engineOn = false;
+
+    document.getElementById("engineBtn").textContent =
+      "▲ موتور";
+
+    notify("سوخت تمام شد! موتور خاموش شد.");
+  }
+}
+
+document.getElementById("engineBtn").onclick = () => {
+
+  if (!engineOn && fuel <= 0) {
+    notify("سوخت کافی برای روشن کردن موتور وجود ندارد.");
+    return;
+  }
+
+  engineOn = !engineOn;
+
+  document.getElementById("engineBtn").textContent =
+    engineOn ? "▲ موتور روشن" : "▲ موتور";
+
+  document.getElementById("engineBtn").classList.toggle(
+    "boost",
+    engineOn
+  );
+
+  notify(engineOn ? "موتور روشن شد." : "موتور خاموش شد.");
+};
+
+document.getElementById("brakeBtn").onclick = () => {
+
+  engineOn = false;
+
+  document.getElementById("engineBtn").textContent =
+    "▲ موتور";
+
+  notify("موتور خاموش شد. ترمز در این نسخه نمایشی است.");
+};
+
+document.getElementById("emergencyBtn").onclick = () => {
+
+  engineOn = false;
+
+  document.getElementById("engineBtn").textContent =
+    "▲ موتور";
+
+  setWheelAngle(0);
+
+  notify("فرمان اضطراری: موتور خاموش و فرمان تثبیت شد.");
+};
+
+// مصرف سوخت هنگام روشن بودن موتور
+setInterval(() => {
+
+  if (engineOn && fuel > 0) {
+
+    fuel -= 0.3;
+
+    updateFuel();
+  }
+
+}, 1000);
+
+/* =========================
+   کلیدهای تجهیزات
+========================= */
+
+function toggleControl(id, callback) {
+
+  const button = document.getElementById(id);
+
+  button.addEventListener("click", () => {
+
+    const active = !button.classList.contains("active");
+
+    button.classList.toggle("active", active);
+
+    callback(active);
+  });
+}
+
+toggleControl("lightBtn", on => {
+
+  lightsOn = on;
+
+  document.querySelector(".cockpit").style.filter =
+    on ? "brightness(1)" : "brightness(.55)";
+
+  notify(on ? "روشنایی کابین فعال شد." : "نور کابین کاهش یافت.");
+});
+
+toggleControl("radarBtn", on => {
+
+  notify(on ? "رادار فعال شد." : "رادار غیرفعال شد.");
+});
+
+toggleControl("shieldBtn", on => {
+
+  shieldOn = on;
+
+  notify(on ? "سپر دفاعی فعال شد." : "سپر دفاعی خاموش شد.");
+});
+
+toggleControl("commBtn", on => {
+
+  notify(on
+    ? "ارتباطات آماده است؛ سیگنالی دریافت نشده."
+    : "ارتباطات غیرفعال شد.");
+});
+
+toggleControl("scanBtn", on => {
+
+  notify(on
+    ? "اسکنر روشن شد؛ منتظر داده‌های فضایی."
+    : "اسکنر خاموش شد.");
+});
+
+toggleControl("mapBtn", on => {
+
+  notify(on
+    ? "نقشه در نسخه بعدی به مسیر سفر متصل می‌شود."
+    : "نقشه بسته شد.");
+});
+
+toggleControl("autoBtn", on => {
+
+  autoPilot = on;
+  manualControl = !on;
+
+  notify(on
+    ? "خلبان خودکار فعال شد."
+    : "کنترل دستی در دسترس است.");
+});
+
+toggleControl("powerBtn", on => {
+
+  notify(on
+    ? "مدیریت انرژی فعال شد."
+    : "مدیریت انرژی به حالت عادی برگشت.");
+});
+
+/* =========================
+   دفترچه و منوها
+========================= */
+
+const manualModal = document.getElementById("manualModal");
+
+document.getElementById("manualBtn").onclick = () => {
+  manualModal.classList.add("show");
+};
+
+document.getElementById("closeManual").onclick = () => {
+  manualModal.classList.remove("show");
+};
+
+manualModal.addEventListener("click", event => {
+
+  if (event.target === manualModal) {
+    manualModal.classList.remove("show");
+  }
+});
+
+document.getElementById("missionBtn").onclick = () => {
+
+  notify("ماموریت: خروج از منطقه خطرناک خورشیدی.");
+};
+
+document.getElementById("logBtn").onclick = () => {
+
+  notify(
+    `گزارش: سوخت ${Math.round(fuel)}٪، موتور ${
+      engineOn ? "روشن" : "خاموش"
+    }`
+  );
+};
+
+document.getElementById("settingsBtn").onclick = () => {
+
+  notify("تنظیمات بیشتر در نسخه بعدی اضافه می‌شوند.");
+};
+
+</script>
+
+</body>
+  </html>
